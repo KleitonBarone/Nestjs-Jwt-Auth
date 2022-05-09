@@ -1,0 +1,41 @@
+version: '3.7'
+services:
+  dev:
+    container_name: nestjs_dev
+    build:
+      context: .
+      target: development
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - ${SERVER_PORT}:${SERVER_PORT}
+      - 9229:9229
+    command: bash -c 'while !</dev/tcp/db/3306; do sleep 1; done; yarn start:dev'
+    expose:
+      - ${SERVER_PORT}
+    env_file:
+      - .env
+    networks:
+      - system-network
+    depends_on:
+      - db
+  db:
+    container_name: mysql
+    image: mysql:5.7
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE_NAME}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_ALLOW_EMPTY_PASSWORD: ok
+      MYSQL_ROOT_HOST: '%'
+    ports:
+      - ${DB_PORT}:${DB_PORT}
+    expose:
+      - ${DB_PORT}
+    networks:
+      - system-network
+networks:
+  system-network:
+    driver: bridge
