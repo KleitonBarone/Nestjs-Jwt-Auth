@@ -10,12 +10,15 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
 
 @Controller('api/v1/users')
+@UseGuards(AuthGuard('jwt'))
 export class UsersController {
   @Inject(UsersService)
   private readonly usersService: UsersService;
